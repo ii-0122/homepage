@@ -1,0 +1,311 @@
+
+<html>
+    <div style="text-align:center; font-size: 40px; font-weight: 500;">고 급</div>
+    <div style="text-align:center; font-size: 18px;" id="flags_num">지뢰: 75개      깃발: 0개</div>
+    <br>
+    <div class="div_main">
+        <canvas class="canvas_main" id="canvas_main" width=600 height=600 onmouseup="fieldClick(window.event);" oncontextmenu="return false"></canvas>
+    </div>
+    <br>
+    <div class="div_main">
+        <button class="button" onclick="location.href='/MineSearch'">
+            <div>돌아가기</div>
+            <i>go</i>
+        </button>
+    </div>
+    <br>
+    <style>
+        .div_main{
+            margin: auto;
+            text-align: center;
+        }
+
+        .canvas_main{
+            background-color: rgb(255, 234, 234);
+        }
+
+        .button{
+            width: 10%;
+            height: 8%;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            padding: 13px 30px 13px;
+            outline: 0;
+            border: 1px solid black;
+            cursor: pointer;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0);
+        }
+        .button i{
+            opacity: 0;
+            font-size: 13px;
+            transition: 0.2s;
+            position: absolute;
+            right: 10px;
+            top: 21px;
+            transition: transform 1;
+        }
+        .button div{
+            transition: transform 0.8s;
+        }
+        .button:hover div{
+            transform: translateX(-6px);
+        }
+        .button::after{
+            content: "";
+            background-color: rgb(255, 211, 211);
+            width: 100%;
+            z-index: -1;
+            position: absolute;
+            height: 100%;
+            top: 7px;
+            left: 7px;
+        }
+        .button:hover i{
+            opacity: 1;
+            transform: translateX(-6px);
+        }
+    </style>
+    <script>
+        var canvas_main = document.getElementById("canvas_main");
+        var context_main = canvas_main.getContext("2d");
+        var field = new Array(400);
+        var toggle = new Array(400);
+        var mine = new Array(400);
+        var flags = new Array(400);
+        var check = new Array(400);
+        const blocksize = 30;
+        var i,j;
+        var mine_num;
+        context_main.fillStyle="rgb(255, 234, 234)";
+        context_main.strokeStyle="rgb(184, 4, 4)";
+        context_main.font = "15px arial";
+        context_main.textAlign = "center";
+
+        init();
+
+        function init(){
+            init_screen();
+            for(i=0;i<400;i++){ toggle[i] = 0; flags[i] = 0; mine[i] = 0; check[i]=0; }
+            putMine();
+            drawField();
+        }
+
+        function init_screen(){
+            for(i=0;i<20;i++){
+                for(j=0;j<20;j++){
+                    context_main.beginPath();
+                    context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                    context_main.closePath();
+                }
+            }
+        }
+
+        function putMine(){
+            for(i=0;i<400;i++){ field[i] = 9; }
+            let index_mine = randNum();
+
+            for(i=0;i<75;i++){
+                let temp_num = index_mine[i];
+                mine[temp_num] = 99;
+                field[temp_num] = 99;
+            }
+            //alert(field);
+        }
+
+        function randNum(){
+            let temp_index = [];
+            i = 0;
+            while(i<75){
+                let n = Math.floor(Math.random()*400);
+                if(!sameNum(n)){
+                    temp_index.push(n); i++;
+                }
+            }
+            function sameNum(n){
+                return temp_index.find((e)=>(e===n));
+            }
+            return temp_index;
+        }
+
+        function fieldClick(event){  // 
+            var rect = canvas_main.getBoundingClientRect();
+            let x = event.clientX - rect.left;
+            let y = event.clientY - rect.top;
+    
+            x = parseInt(x/30);
+            y = parseInt(y/30);
+
+            let t = 20*x + y;
+            
+            if(event.button===2){
+                toggle[t]++;
+                toggle[t] = toggle[t]%2;
+
+                if(toggle[t]%2===1){
+                    field[t] = "※";
+                    flags[t] = 99;
+                    let f_num = 0;
+                    for(i=0;i<400;i++){
+                        if(toggle[i]===1){ f_num++; }
+                    }
+                    document.getElementById("flags_num").innerHTML = "지뢰: 75개     깃발: " + f_num + "개";
+                }else{
+                    field[t] = 9;
+                    flags[t] = 0;
+                    let f_num = 0;
+                    for(i=0;i<400;i++){
+                        if(toggle[i]===1){ f_num++; }
+                    }
+                    document.getElementById("flags_num").innerHTML = "지뢰: 75개     깃발: " + f_num + "개";
+                }
+            }
+            else{ //field[t] = ""; 
+                findLand(x,y);
+                findNum();
+                if(mine[t]===99){
+                    drawMine();
+                    setTimeout(function(){ alert("Game Over!\n"); },100);
+                }
+            }
+
+            drawField();
+            let mine_string = mine.join("");
+            let flags_string = flags.join("");
+            if(mine_string===flags_string){ setTimeout(function(){ alert("Game Clear!\n"); },100); init(); }
+        }
+
+        function findLand(a,b){
+            // *
+            let x = a;
+            let y = b;
+            let temp = 20*x + y;
+            if(check[temp]!==1){
+                if(x>=0 &&x<20){
+                    if(y>=0&&y<20){
+                        check[temp] = 1;
+                        let test = findMine(x,y);
+                        if ( test !== true ) {
+                            findLand( x , y - 1 );
+                            findLand( x + 1 , y );
+                            findLand( x , y + 1 );
+                            findLand( x - 1 , y );
+                        }else{
+                            return;
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        function findMine(a,b){
+            mine_num = 0;
+            for(i=-1;i<2;i++){
+                for(j=-1;j<2;j++){
+                    let n = 20*(a+i) + (b+j);
+                    if(a+i>=0&&a+i<20){
+                        if(b+j>=0&&b+j<20){
+                            if(mine[n]===99){ mine_num++; }
+                        }
+                    }
+                }
+            }
+            field[20*a+b] = mine_num;
+            if(mine_num!==0){ return true; }
+        }
+
+        function findNum(){
+            let q;
+            for(q=0;q<400;q++){
+                if(field[q]===0){
+                    let find_x = Math.floor(q/20);
+                    let find_y = Math.floor(q%20);
+
+                    if(find_x-1>=0 && find_y-1>=0){ 
+                        findMine(find_x-1,find_y-1);
+                        if(check[q-21]!==1 && mine_num===0){ field[q-21] = 9;}
+                    }
+                    if(find_x+1<20 && find_y-1>=0){
+                        findMine(find_x+1,find_y-1);
+                        if(check[q+19]!==1 && mine_num===0){ field[q+19] = 9;}
+                    }
+                    if(find_x+1<20 && find_y+1<20){
+                        findMine(find_x+1,find_y+1);
+                        if(check[q+21]!==1 && mine_num===0){ field[q+21] = 9;}
+                    }
+                    if(find_x-1>=0 && find_y+1<20){
+                        findMine(find_x-1,find_y+1);
+                        if(check[q-19]!==1 && mine_num===0){ field[q-19] = 9;}  
+                    }
+                }
+            }
+        }
+
+        function drawField(){
+            context_main.clearRect(0,0,600,600);
+            for(i=0;i<20;i++){
+                for(j=0;j<20;j++){
+                    let index = 20*i + j;
+                    let k = field[index];
+                    switch(k){
+                        case 0:
+                        context_main.fillStyle="rgb(253, 185, 185)";
+                        context_main.beginPath();
+                        context_main.fillRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.closePath();
+                        break;
+
+                        case 9:     // 클릭하지 않은 상태
+                        context_main.beginPath();
+                        context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.closePath();
+                        break;
+
+                        case "※":
+                        context_main.beginPath();
+                        context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.fillStyle="rgb(184, 4, 4)";
+                        context_main.fillText("※",i*blocksize+(blocksize/2),j*blocksize+(blocksize/1.5));
+                        context_main.closePath();
+                        break;
+
+                        case 99:    // 지뢰가 있지만 발견하지 않은 상태
+                        context_main.beginPath();
+                        context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.fillStyle="rgb(184, 4, 4)";
+                        context_main.fillText("◇",i*blocksize+(blocksize/2),j*blocksize+(blocksize/1.5));
+                        context_main.closePath();
+                        break;
+
+                        case 100:   // 지뢰 클릭
+                        context_main.beginPath();
+                        context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.fillStyle="rgb(184, 4, 4)";
+                        context_main.fillText("◆",i*blocksize+(blocksize/2),j*blocksize+(blocksize/1.5));
+                        context_main.closePath();
+                        break;
+
+                        default:
+                        context_main.beginPath();
+                        //context_main.fillStyle="rgb(173, 216, 181)";
+                        //context_main.fillRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.strokeRect(i*blocksize,j*blocksize,blocksize,blocksize);
+                        context_main.fillStyle="rgb(184, 4, 4)";
+                        context_main.fillText(k,i*blocksize+(blocksize/2),j*blocksize+(blocksize/1.5));
+                        context_main.closePath();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function drawMine(){
+            for(i=0;i<400;i++){
+               if(mine[i]===99){ field[i] = 100; }
+            }
+        }
+
+    </script>
+</html>

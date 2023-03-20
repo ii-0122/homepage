@@ -1,0 +1,238 @@
+<html>
+    <body>
+        <div class="screen_tetris">
+            <canvas class="canvas_tetris" id="canvas_tetris" width=300 height=600></canvas>
+        </div>
+    </body>
+    <style>
+        .screen_tetris{
+            margin: auto;
+            text-align: center;
+        }
+        .canvas_tetris{
+            background: rgb(230,255,232);
+        }
+    </style>
+    <script>
+        var canvas_tetris = document.getElementById("canvas_tetris");
+        var context_tetris = canvas_tetris.getContext("2d");
+        var block = [[0,0],[0,1],[0,2],[0,3],  // block1
+                      [0,0],[0,1],[0,2],[1,2],  // block2
+                      [0,0],[0,1],[0,2],[-1,2], // block3
+                      [0,0],[-1,1],[0,1],[1,1], // block4
+                      [0,0],[1,0],[1,1],[2,1],  // block5
+                      [0,0],[1,0],[-1,1],[0,1], // block6
+                      [0,0],[1,0],[0,1],[1,1]   // block7
+                    ];
+        var screen_game = new Array(200);
+        var stateCode;
+        var posX, posY;     // posX : 0 ~ 9  posY : 0 ~ 18
+        var blockStyle;     // 0 ~ 6
+        const blockSize = 30;
+        var leftVal, rightVal;
+        context_tetris.strokeStyle = "white";
+        context_tetris.fillStyle = "rgb(128, 10, 10)";
+
+        window.onkeydown = function(){
+            // default stateCode = 0
+            if(event.keyCode===37){ stateCode = 1; }    // ←
+            if(event.keyCode===38){ stateCode = 2; }    // ↑ - rotation
+            if(event.keyCode===39){ stateCode = 3; }    // →
+            if(event.keyCode===40){ stateCode = 4; }    // ↓
+        }
+
+        function init(){
+            posX = 4;
+            posY = 0;
+            stateCode = 0;
+            blockStyle = 4*Math.floor(Math.random()*7);     // 0, 4, 8, 12, 16, 20, 24
+        }
+
+        function printScreen(){
+            for(j=0;j<20;j++){
+                for(i=0;i<10;i++){
+                    let s_index = 10*j + i;
+                    if(screen_game[s_index]===1){
+                        context_tetris.beginPath();
+                        context_tetris.fillRect(blockSize*i,blockSize*j,blockSize,blockSize);
+                        context_tetris.strokeRect(blockSize*i+3,blockSize*j+3,blockSize-3,blockSize-3);
+                        context_tetris.closePath();
+                    }
+                }
+            }
+        }
+
+        function printBlock(){
+            for(i=0;i<4;i++){
+                context_tetris.beginPath();
+                context_tetris.fillRect(blockSize*(posX+block[blockStyle+i][0]),blockSize*(posY+block[blockStyle+i][1]),blockSize,blockSize);
+                context_tetris.strokeRect(blockSize*(posX+block[blockStyle+i][0])+3,blockSize*(posY+block[blockStyle+i][1])+3,blockSize,blockSize);
+                context_tetris.closePath();
+            }
+        }
+
+        function rotateBlock(tempblock){
+            let temp_x, temp_y;
+            if(blockStyle!==24){
+                for(i=1;i<4;i++){
+                    temp_x = tempblock[blockStyle+i][0]*Math.cos(Math.PI/2) - tempblock[blockStyle+i][1]*Math.sin(Math.PI/2);
+                    temp_y = tempblock[blockStyle+i][0]*Math.sin(Math.PI/2) + tempblock[blockStyle+i][1]*Math.cos(Math.PI/2);
+                    tempblock[blockStyle+i][0] = Math.round(temp_x);
+                    tempblock[blockStyle+i][1] = Math.round(temp_y);
+                }
+            }
+        }
+
+        function fixBlock(){
+            for(i=0;i<4;i++){
+                let temp_index = 10*(posY+block[blockStyle+i][1]) + (posX+block[blockStyle+i][0]);
+                screen_game[temp_index] = 1;
+            }
+            init();
+        }
+        function findValue(tempblock){
+            if(stateCode===1){
+                let testValue = 99;
+                for(i=0;i<4;i++){
+                    if(testValue>tempblock[blockStyle+i][0]){ testValue = tempblock[blockStyle+i][0]; }
+                }
+                return testValue;
+            }
+            else if(stateCode===3){
+                let testValue = -99;
+                for(i=0;i<4;i++){
+                    if(testValue<tempblock[blockStyle+i][0]){ testValue = tempblock[blockStyle+i][0]; }
+                }
+                return testValue;
+            }
+            else if(stateCode===2){
+                leftVal = 99;
+                rightVal = -99;
+                for(i=0;i<4;i++){
+                    if(leftVal>tempblock[blockStyle+i][0]){ leftVal = tempblock[blockStyle+i][0]; }
+                    if(rightVal<tempblock[blockStyle+i][0]){ rightVal = tempblock[blockStyle+i][0]; }
+                }
+                return 0;
+            }
+            else{
+                let testValue = -1;
+                for(i=0;i<4;i++){
+                    if(testValue<tempblock[blockStyle+i][1]){ testValue = tempblock[blockStyle+i][1]; }
+                }
+                return testValue;
+            }
+        }
+
+        function testBlock(){
+            let x = posX;
+            let y = posY;
+            if(stateCode===2){
+                let tb = block.map(v => v.slice());     //
+                rotateBlock(tb);
+                let v = findValue(tb);
+                if(leftVal+x<0){ x = x-leftVal; }
+                else if(rightVal+x>9){ x = x-rightVal; }
+                for(i=0;i<4;i++){
+                    let pos_screen = 10*(y+tb[blockStyle+i][1]) + (x+tb[blockStyle+i][0]);
+                    if(screen_game[pos_screen]===1){ return 1; }
+                }
+                return 0;
+            }
+            else{
+                let v = findValue(block);
+                if(stateCode===1){
+                    x--;
+                    if(v+x<0){ return 1; }
+                }
+                else if(stateCode===3){
+                    x++;
+                    if(v+x>9){ return 1; }
+                }
+                else{ 
+                    y++;
+                    if(v+y>19){ return 1; }
+                }
+                for(i=0;i<4;i++){
+                    let pos_screen = 10*(y+block[blockStyle+i][1]) + (x+block[blockStyle+i][0]);
+                    if(screen_game[pos_screen]===1){ return 1; }
+                }
+                return 0;
+            }
+        }
+        
+        function moveBlock(){
+            var timecount = requestAnimationFrame(moveBlock);
+            context_tetris.clearRect(0,0,300,600);
+            printScreen();
+
+            if(stateCode===2){
+                if(testBlock()===0){
+                    rotateBlock(block);
+                    if(leftVal+posX<0){ posX = posX-leftVal; }
+                    else if(rightVal+posX>9){ posX = posX-rightVal; }
+                }
+                stateCode = 0;
+            }
+            else if(stateCode===4){
+                if(testBlock()===0){ posY++; }
+                else{ fixBlock(); }
+                stateCode = 0;
+            }
+            else{
+                if(testBlock()===0){
+                    if(stateCode===1){ posX--; }
+                    else if(stateCode===3){ posX++; }
+                }
+                stateCode = 0;
+            }
+
+            printBlock();
+            deleteLine();
+
+            if(timecount%40===0){
+                if(testBlock()===1){ fixBlock();}
+                else{ posY++; }
+                if(testEnd()===true){
+                    cancelAnimationFrame(timecount);
+                    setTimeout(function(){ alert("Game Over\n"); },100);
+                }
+            }
+        }
+
+        function testEnd(){
+            for(i=0;i<10;i++){
+                if(screen_game[i]===1){ return true; }
+            }
+            return false;
+        }
+
+        function deleteLine(){
+            let q;
+            for(j=19;j>0;j--){
+                let p = 0;
+                while(p<10){
+                    let k = 10*j +p;
+                    q = 0;
+                    if(screen_game[k]===0){ break; }
+                    q = 1;  // 한 줄이 모두 꽉 찼으면 q는 1 아니면 0
+                    p++;
+                }
+                if(q===1){
+                    for(i=j;i>0;i--){
+                        for(let l=0;l<10;l++){
+                            let k = 10*i +l;
+                            screen_game[k] = screen_game[k-10];
+                        }
+                    }
+                    j += 1;
+                }
+            }        
+        }
+        
+        init();
+        for(i=0;i<200;i++){
+            screen_game[i] = 0;
+        }
+        moveBlock();
+    </script>
+</html>

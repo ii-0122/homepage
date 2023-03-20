@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    </head>
+    <body>
+        <div id="div1" class="div_chat"></div>
+    </body>
+</html>
+<script>
+    var txtnn = document.getElementById("div1");
+    setInterval(function(){
+        var dd = document.createElement("div");
+        var nn = document.createTextNode("테스트 chat 123");
+        var bb = document.createElement("span");
+        bb.innerHTML = "<br/><br/>";
+        dd.classList.add('mbox');
+        dd.append(nn);
+        txtnn.append(dd,bb);
+        
+        document.body.txtnn.append(dd);
+    }, 1000);
+</script>
+<style>
+    .mbox{
+        padding:5px;
+        float:left;
+        text-align:left;
+        background-color: antiquewhite;
+        font-size:15px;
+        font-weight: 400;
+        border:solid 1px;
+        border-color:black;
+        box-shadow: 0px 0px 5px 0px #443129;
+    }
+
+    .div_chat{
+        margin: auto;
+        text-align: left;
+        width: 30%;
+        height: 80%;
+        overflow-y: scroll;
+        background-color: rgb(231, 231, 231);
+        border: 3px;
+        border-color:black;
+    }
+</style>

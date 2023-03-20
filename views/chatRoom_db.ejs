@@ -1,0 +1,114 @@
+
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+        <meta charset="UTF-8">
+        <title>chat</title>
+    </head>
+    <body>
+        <br>
+        <div class="div_chat" id="chat" name="chat"></div>
+        <form id="chat_form" method="POST" action="/chat_save" style="text-align:center;">
+            <input hidden="hidden" id="name_hidden" name="chat_name" value="name_default"/>
+            <textarea name="chat_txt" style="font-size:18px; width:30%; height:60px;" maxlength="150"></textarea>
+            <br>
+            <button id="btn1" class="btn_style">전송</button>
+        </form>
+    </body>
+</html>
+<script>
+    var myName = prompt("채팅방에서 사용할 닉네임을 입력하세요.","default");
+    document.getElementById("name_hidden").value = myName;
+
+    var msgBox_div = document.getElementById("chat");
+    //msgBox_div.scrollTop = msgBox_div.scrollHeight;
+
+    setInterval(function(){
+        fetch("/conn_chat",{
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            test_txt: "fetch success.."
+        })
+        })
+        .then((res)=>res.json())
+        .then((res)=>{
+            msgBox_div.innerHTML ="";
+            res.forEach(element => {
+                let time = timeNow();
+                let instant_txt = element.inner_text;
+                instant_txt = instant_txt.replace(/\n/gi,'<br>');
+                var screen_msg ="<span style='font-size:17px; font-weight:600;'>[ " + element.user_name + " ] </span><span style='font-size:11px;'>" + time +"</span><br>" + instant_txt;
+                $("#chat").append("<div class='mbox'>"+ screen_msg + "</div>");
+                $("#chat").append("<div><br><br><br></div>");
+                
+                console.log(screen_msg);
+            });
+        })
+        $('#chat').scrollTop($('#chat').height());
+        }, 1000);
+
+    btn1.onclick = function(e){
+        var formData = $("#chat_form").serialize();
+
+        $.ajax({
+            url: "/chat_save",
+            //processData: false,
+            //contentType: false,
+            type: "POST",
+            data: formData,
+            success: function (data) {},
+            error: function(data){ alert(xhr + "  : " + status); }
+        });
+        return false;
+    }
+
+    function timeNow(){
+        let today = new Date();
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+        
+        let now = hours + " : " + minutes;
+        return now;
+    }
+</script>
+<style>
+    .divstyle{
+        text-align: center;
+    }
+
+    .div_chat{
+        margin: auto;
+        text-align: left;
+        width: 30%;
+        height: 80%;
+        overflow: auto;
+        background-color: rgb(231, 231, 231);
+        border: 3px;
+        border-color:black;
+    }
+
+    .mbox{
+        padding: 2px;
+        width:95%;
+        height:auto;
+        float:left;
+        text-align:left;
+        background-color: rgb(255, 243, 228);
+        font-size:15px;
+        font-weight: 400;
+        border:solid 1px;
+        border-color:black;
+        box-shadow: 0px 0px 5px 0px #443129;
+    }
+
+    .btn_style{
+        width: 30%;
+        height: 35px;
+        background-color:rgb(255, 242, 218);
+        border-color: rgb(0, 0, 0);
+    }
+    .btn_style:hover{
+        background-color: rgb(255, 237, 204);
+    }
+</style>

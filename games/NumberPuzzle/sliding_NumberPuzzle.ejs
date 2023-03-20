@@ -1,0 +1,691 @@
+
+<html>
+    <body>
+        <div class="divStyle">
+            <button class="btn-block" onclick="buttonReset();"><span style="font-size:130%;"><br>Click</span><span style="font-size:130%;"><br>Reset</span></button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class ="btn-block" onclick="location.href='/'"><span style="font-size:130%;"><br>Go</span><span style="font-size:120%; font-weight:700;"><br>메인으로</span></button>
+        </div>
+        <br><br><br>
+        <table class="tablestyle">
+            <tr>
+                <td width=140 height=140><button class ="button" id="button_n1" onclick="clickButton(1);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n2" onclick="clickButton(2);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n3" onclick="clickButton(3);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n4" onclick="clickButton(4);"></button></td>
+            </tr>
+            <tr>
+                <td width=140 height=140><button class ="button" id="button_n5" onclick="clickButton(5);">슬</button></td>
+                <td width=140 height=140><button class ="button" id="button_n6" onclick="clickButton(6);">라</button></td>
+                <td width=140 height=140><button class ="button" id="button_n7" onclick="clickButton(7);">이</button></td>
+                <td width=140 height=140><button class ="button" id="button_n8" onclick="clickButton(8);">딩</button></td>
+            </tr>
+            <tr>
+                <td width=140 height=140><button class ="button" id="button_n9" onclick="clickButton(9);">숫</button></td>
+                <td width=140 height=140><button class ="button" id="button_n10" onclick="clickButton(10);">자</button></td>
+                <td width=140 height=140><button class ="button" id="button_n11" onclick="clickButton(11);">퍼</button></td>
+                <td width=140 height=140><button class ="button" id="button_n12" onclick="clickButton(12);">즐</button></td>
+            </tr>
+            <tr>
+                <td width=140 height=140><button class ="button" id="button_n13" onclick="clickButton(13);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n14" onclick="clickButton(14);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n15" onclick="clickButton(15);"></button></td>
+                <td width=140 height=140><button class ="button" id="button_n16" onclick="clickButton(16);"></button></td>
+            </tr>
+        </table>
+    </body>
+    <style>
+        .divStyle{
+            margin: auto;
+            text-align:center;
+        }
+        .tablestyle{
+            border-radius:10px;
+            margin:auto;
+            border:2px solid rgb(250, 170, 79);
+            background-color: white;
+        }
+        .button{
+            border-radius:10px;
+            margin: none;
+            width: 140px;
+            height: 140px;
+            font-size: 60px;
+            border:1px solid rgb(250, 170, 79);
+            background-color: rgb(255, 248, 245);
+            color: rgb(250, 170, 79);
+            font-weight: bold;
+        }
+        .btn-block{
+            border-radius:10px;
+            position: relative;
+            text-align:center;
+            box-shadow: none;
+            border: none;
+            width: 10%;
+            height: 8%;
+            background-color: white;
+            color:rgb(226, 154, 71);
+        }
+        .btn-block span{
+            border-radius:10px;
+            display: block;
+            box-shadow:none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(255, 248, 245);
+            border: 2px solid rgb(250, 170, 79);
+            margin: 0;
+            text-align: center;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            -webkit-transition: all .3s;
+            transition: all .3s;
+        }
+        .btn-block span:nth-child(1){
+            -webkit-transform: rotateX(90deg);
+            -moz-transform: rotateX(90deg);
+            transform: rotateX(90deg);
+            -webkit-transform-origin: 50% 50% -20px;
+            -moz-transform-origin: 50% 50% -20px;
+            transform-origin: 50% 50% -20px;
+        }
+        .btn-block span:nth-child(2){
+            -webkit-transform: rotateX(0deg);
+            -moz-transform: rotateX(0deg);
+            transform: rotateX(0deg);
+            -webkit-transform-origin: 50% 50% -20px;
+            -moz-transform-origin: 50% 50% -20px;
+            transform-origin: 50% 50% -20px;
+        }
+        .btn-block:hover span:nth-child(1) {
+            -webkit-transform: rotateX(0deg);
+            -moz-transform: rotateX(0deg);
+            transform: rotateX(0deg);
+        }
+        .btn-block:hover span:nth-child(2) {
+            -webkit-transform: rotateX(-90deg);
+            -moz-transform: rotateX(-90deg);
+            transform: rotateX(-90deg);
+        }
+    </style>
+    <script>
+        var temp, up, left, right, down;
+        var rand;
+        var score;
+        var temp_val, up_val, left_val, right_val, down_val;
+        var randomNumber = new Array(16);
+
+        function testnumb(n){
+            for(var i=0;i<randomNumber.length;i++){
+                if(randomNumber[i]===n){ return true; }
+            }
+            return false;
+        }
+
+        function makeRandom(){
+            var i = 0;
+            while(i<16){
+                var n = Math.floor(Math.random()*16); // 0 ~ 15 사이
+                if(testnumb(n)===false){
+                    randomNumber[i] = n;
+                    i++;
+                }
+            }
+        }
+        function buttonReset(){
+            for(i=0;i<16;i++){ randomNumber[i] = 16; }
+            makeRandom();
+            for(var i=0;i<16;i++){
+                if(randomNumber[i]===0){ randomNumber[i] = ""; }
+            }
+            score = 0;
+            //alert(randomNumber);
+            temp = document.getElementById("button_n1");
+            temp.innerText = randomNumber[0];
+            temp = document.getElementById("button_n2");
+            temp.innerText = randomNumber[1];
+            temp = document.getElementById("button_n3");
+            temp.innerText = randomNumber[2];
+            temp = document.getElementById("button_n4");
+            temp.innerText = randomNumber[3];
+            temp = document.getElementById("button_n5");
+            temp.innerText = randomNumber[4];
+            temp = document.getElementById("button_n6");
+            temp.innerText = randomNumber[5];
+            temp = document.getElementById("button_n7");
+            temp.innerText = randomNumber[6];
+            temp = document.getElementById("button_n8");
+            temp.innerText = randomNumber[7];
+            temp = document.getElementById("button_n9");
+            temp.innerText = randomNumber[8];
+            temp = document.getElementById("button_n10");
+            temp.innerText = randomNumber[9];
+            temp = document.getElementById("button_n11");
+            temp.innerText = randomNumber[10];
+            temp = document.getElementById("button_n12");
+            temp.innerText = randomNumber[11];
+            temp = document.getElementById("button_n13");
+            temp.innerText = randomNumber[12];
+            temp = document.getElementById("button_n14");
+            temp.innerText = randomNumber[13];
+            temp = document.getElementById("button_n15");
+            temp.innerText = randomNumber[14];
+            temp = document.getElementById("button_n16");
+            temp.innerText = randomNumber[15];
+        }
+        function check_end(){
+            var line = "";
+            var line0 = "123456789101112131415"
+            var templine = new Array(15);
+            var i = 0;
+            for(i=0;i<14;i++){ line[i] = i; }
+
+            templine[0] = document.getElementById("button_n1").innerText;
+            templine[1] = document.getElementById("button_n2").innerText;
+            templine[2] = document.getElementById("button_n3").innerText;
+            templine[3] = document.getElementById("button_n4").innerText;
+            templine[4] = document.getElementById("button_n5").innerText;
+            templine[5] = document.getElementById("button_n6").innerText;
+            templine[6] = document.getElementById("button_n7").innerText;
+            templine[7] = document.getElementById("button_n8").innerText;
+            templine[8] = document.getElementById("button_n9").innerText;
+            templine[9] = document.getElementById("button_n10").innerText;
+            templine[10] = document.getElementById("button_n11").innerText;
+            templine[11] = document.getElementById("button_n12").innerText;
+            templine[12] = document.getElementById("button_n13").innerText;
+            templine[13] = document.getElementById("button_n14").innerText;
+            templine[14] = document.getElementById("button_n15").innerText;
+
+            for(i=0;i<15;i++){line += String(templine[i]); }
+            
+            if(line===line0){ return true; }
+            else{ return false; }
+    
+        }
+        function clickButton(a){
+            //var btn = document.getElementById();
+            //btn.innerText = '';
+            switch(a){
+                case 1:
+                    temp = document.getElementById("button_n1");
+                    right = document.getElementById("button_n2");
+                    down = document.getElementById("button_n5");
+                    temp_val = temp.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 2:
+                    temp = document.getElementById("button_n2");
+                    left = document.getElementById("button_n1");
+                    right = document.getElementById("button_n3");
+                    down = document.getElementById("button_n6");
+                    temp_val = temp.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 3:
+                    temp = document.getElementById("button_n3");
+                    left = document.getElementById("button_n2");
+                    right = document.getElementById("button_n4");
+                    down = document.getElementById("button_n7");
+                    temp_val = temp.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 4:
+                    temp = document.getElementById("button_n4");
+                    left = document.getElementById("button_n3");
+                    down = document.getElementById("button_n8");
+                    temp_val = temp.innerText;
+                    left_val = left.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 5:
+                    temp = document.getElementById("button_n5");
+                    up = document.getElementById("button_n1");
+                    right = document.getElementById("button_n6");
+                    down = document.getElementById("button_n9");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 6:
+                    temp = document.getElementById("button_n6");
+                    up = document.getElementById("button_n2");
+                    left = document.getElementById("button_n5");
+                    right = document.getElementById("button_n7");
+                    down = document.getElementById("button_n10");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 7:
+                    temp = document.getElementById("button_n7");
+                    up = document.getElementById("button_n3");
+                    left = document.getElementById("button_n6");
+                    right = document.getElementById("button_n8");
+                    down = document.getElementById("button_n11");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 8:
+                    temp = document.getElementById("button_n8");
+                    up = document.getElementById("button_n4");
+                    left = document.getElementById("button_n7");
+                    down = document.getElementById("button_n12");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 9:
+                    temp = document.getElementById("button_n9");
+                    up = document.getElementById("button_n5");
+                    right = document.getElementById("button_n10");
+                    down = document.getElementById("button_n13");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 10:
+                    temp = document.getElementById("button_n10");
+                    up = document.getElementById("button_n6");
+                    left = document.getElementById("button_n9");
+                    right = document.getElementById("button_n11");
+                    down = document.getElementById("button_n14");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 11:
+                    temp = document.getElementById("button_n11");
+                    up = document.getElementById("button_n7");
+                    left = document.getElementById("button_n10");
+                    right = document.getElementById("button_n12");
+                    down = document.getElementById("button_n15");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 12:
+                    temp = document.getElementById("button_n12");
+                    up = document.getElementById("button_n8");
+                    left = document.getElementById("button_n11");
+                    down = document.getElementById("button_n16");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    down_val = down.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(down_val.length===0){
+                        down.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 13:
+                    temp = document.getElementById("button_n13");
+                    up = document.getElementById("button_n9");
+                    right = document.getElementById("button_n14");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    right_val = right.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 14:
+                    temp = document.getElementById("button_n14");
+                    up = document.getElementById("button_n10");
+                    left = document.getElementById("button_n13");
+                    right = document.getElementById("button_n15");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 15:
+                    temp = document.getElementById("button_n15");
+                    up = document.getElementById("button_n11");
+                    left = document.getElementById("button_n14");
+                    right = document.getElementById("button_n16");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    right_val = right.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    if(right_val.length===0){
+                        right.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                case 16:
+                    temp = document.getElementById("button_n16");
+                    up = document.getElementById("button_n12");
+                    left = document.getElementById("button_n15");
+                    temp_val = temp.innerText;
+                    up_val = up.innerText;
+                    left_val = left.innerText;
+                    if(temp_val.length===0){ break; }
+                    if(up_val.length===0){
+                        up.innerText = temp_val;
+                        temp.innerText ='';
+                        score += 1;
+                        break;
+                    }
+                    if(left_val.length===0){
+                        left.innerText = temp_val;
+                        temp.innerText = '';
+                        score += 1;
+                        break;
+                    }
+                    break;
+                default:
+            }
+            var c = check_end();
+            //alert(c);
+            if(c===true){
+                setTimeout(function(){
+                    alert("축하합니다! 퍼즐을 다 맞추셨습니다.\n블럭을 옮긴 횟수: " + score);
+                    if(confirm("점수를 기록하시겠습니까?")){
+                        var name = prompt("점수를 기록할 닉네임을 입력하세요.","");
+                        window.location.href = "/saveData_NumberPuzzle?name=" + name + "&score=" + score;
+                    }
+                },300);
+            }
+        }
+    </script>
+</html>

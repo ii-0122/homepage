@@ -1,0 +1,160 @@
+
+<html>
+    <br><br>
+    <div class="divstyle" style="font-size:60px; font-weight: 500;">지뢰 찾기</div>
+    <br><br>
+    <div class="divstyle">
+        <button class="button1" onclick="location.href='/MineSearch?dif=easy'">초 급</button>
+    </div>
+    <br>
+    <div class="divstyle">
+        <button class="button2" onclick="location.href='/MineSearch?dif=normal'">중 급</button>
+    </div>
+    <br>
+    <div class="divstyle">
+        <button class="button3" onclick="location.href='/MineSearch?dif=hard'">고 급</button>
+    </div>
+    <br><br>
+    <div class="divstyle">
+        <button class="button" onclick="location.href='/'">
+            <div>메인으로</div>
+            <i>go</i>
+        </button>
+    </div>
+</html>
+<style>
+    .divstyle{
+        text-align: center;
+        margin: auto;
+    }
+    
+    .button{
+        width: 10%;
+        height: 8%;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 1px;
+        padding: 13px 30px 13px;
+        outline: 0;
+        border: 1px solid black;
+        cursor: pointer;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .button i{
+        opacity: 0;
+        font-size: 13px;
+        transition: 0.2s;
+        position: absolute;
+        right: 10px;
+        top: 21px;
+        transition: transform 1;
+    }
+    .button div{
+        transition: transform 0.8s;
+    }
+    .button:hover div{
+        transform: translateX(-6px);
+    }
+    .button::after{
+        content: "";
+        background-color: #fffd73;
+        width: 100%;
+        z-index: -1;
+        position: absolute;
+        height: 100%;
+        top: 7px;
+        left: 7px;
+    }
+    .button:hover i{
+        opacity: 1;
+        transform: translateX(-6px);
+    }
+
+    .button1{
+        width: 20%;
+        height: 15%;
+        font-size: 45px;
+        font-weight: 300;
+        letter-spacing: 1px;
+        padding: 13px 50px 13px;
+        outline: 0;
+        border: 2px solid black;
+        cursor: pointer;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .button1::after{
+        content: "";
+        background-color: rgb(255, 190, 222);
+        width: 100%;
+        z-index: -1;
+        position: absolute;
+        height: 100%;
+        top: 10px;
+        left: 10px;
+        transition: 0.2s;
+    }
+    .button1:hover::after{
+        top: 0px;
+        left: 0px;
+    }
+
+    .button2{
+        width: 20%;
+        height: 15%;
+        font-size: 45px;
+        font-weight: 300;
+        letter-spacing: 1px;
+        padding: 13px 50px 13px;
+        outline: 0;
+        border: 2px solid black;
+        cursor: pointer;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .button2::after{
+        content: "";
+        background-color: rgb(157, 255, 175);
+        width: 100%;
+        z-index: -1;
+        position: absolute;
+        height: 100%;
+        top: 10px;
+        left: 10px;
+        transition: 0.2s;
+    }
+    .button2:hover::after{
+        top: 0px;
+        left: 0px;
+    }
+
+    .button3{
+        width: 20%;
+        height: 15%;
+        font-size: 45px;
+        font-weight: 300;
+        letter-spacing: 1px;
+        padding: 13px 50px 13px;
+        outline: 0;
+        border: 2px solid black;
+        cursor: pointer;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .button3::after{
+        content: "";
+        background-color: rgb(255, 184, 184);
+        width: 100%;
+        z-index: -1;
+        position: absolute;
+        height: 100%;
+        top: 10px;
+        left: 10px;
+        transition: 0.2s;
+    }
+    .button3:hover::after{
+        top: 0px;
+        left: 0px;
+    }
+</style>

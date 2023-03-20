@@ -1,0 +1,266 @@
+<html>
+    <body>
+        <br>
+        <div class="divStyle">
+            <canvas class="canvasStyle" id="canvas" width=300 height=600></canvas>
+        </div>
+        <div class="divStyle">
+            <canvas class="floor" width=300 height=50></canvas>
+        </div>
+    </body>
+    <style>
+        .divStyle{
+            margin: auto;
+            text-align:center;
+        }
+        .floor{
+            background: rgb(109, 20, 64);
+        }
+        .canvasStyle{
+            background: rgb(250, 230, 255);
+        }
+    </style>
+    <script>
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var x = [[0,0,0,0],[0,1,2,3],[0,0,0,0],[0,1,2,3],
+                 [0,0,0,1],[0,1,2,0],[0,1,1,1],[0,-2,-1,0],
+                 [0,0,-1,0],[0,0,1,2],[0,1,0,0],[0,1,2,2],
+                 [0,-1,0,1],[0,0,1,0],[0,1,2,1],[0,-1,0,0],
+                 [0,1,1,2],[0,-1,0,-1],[0,1,1,2],[0,-1,0,-1],
+                 [0,1,-1,0],[0,0,1,1],[0,1,-1,0],[0,0,1,1],
+                 [0,1,0,1],[0,1,0,1],[0,1,0,1],[0,1,0,1]
+                ]; 
+        var y = [[0,1,2,3],[0,0,0,0],[0,1,2,3],[0,0,0,0],
+                 [0,1,2,2],[0,0,0,1],[0,0,1,2],[0,1,1,1],
+                 [0,1,2,2],[0,1,1,1],[0,0,1,2],[0,0,0,1],
+                 [0,1,1,1],[0,1,1,2],[0,0,0,1],[0,1,1,2],
+                 [0,0,1,1],[0,1,1,2],[0,0,1,1],[0,1,1,2],
+                 [0,0,1,1],[0,1,1,2],[0,0,1,1],[0,1,1,2],
+                 [0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1],
+                ];
+        var screen = new Array(200);    // height(20) x width(10) = 200
+        var Leftblock = [[0,1,2,3],[0],[0,1,2,3],[0],
+                         [0,1,2],[0,3],[0,2,3],[0,1],
+                         [0,1,2],[0,1],[0,2,3],[0,3],
+                         [0,1],[0,1,3],[0,3],[0,1,3],
+                         [0,2],[0,1,3],[0,2],[0,1,3],
+                         [0,2],[0,1,3],[0,2],[0,1,3],
+                         [0,2],[0,2],[0,2],[0,2]
+                        ];
+        var Rightblock = [[0,1,2,3],[3],[0,1,2,3],[3],
+                          [0,1,3],[2,3],[1,2,3],[0,3],
+                          [0,1,3],[0,3],[1,2,3],[2,3],
+                          [0,3],[0,2,3],[2,3],[0,2,3],
+                          [1,3],[0,2,3],[1,3],[0,2,3],
+                          [1,3],[0,2,3],[1,3],[0,2,3],
+                          [1,3],[1,3],[1,3],[1,3]
+                         ];
+        var Downblock = [[3],[0,1,2,3],[3],[0,1,2,3],
+                         [2,3],[1,2,3],[0,3],[1,2,3],
+                         [2,3],[1,2,3],[1,3],[0,1,3],
+                         [1,2,3],[2,3],[0,2,3],[1,3],
+                         [0,2,3],[2,3],[0,2,3],[2,3],
+                         [1,2,3],[1,3],[1,2,3],[1,3],
+                         [2,3],[2,3],[2,3],[2,3]
+                        ];
+        var Currentblock = 0;
+        var most_left, most_right, most_down;
+        var posX, posY;
+        var i,j;
+        var stateCode;
+        var posIndex;
+        const h = 30;
+
+        window.onkeydown = function(){
+            if(event.keyCode===37){ stateCode = 1; }    // left
+            if(event.keyCode===38){ stateCode = 2; }    // up - rotation
+            if(event.keyCode===39){ stateCode = 3; }    // right
+            if(event.keyCode===40){ stateCode = 4; }    // down
+            //if(){ stateCode = 5; } // space
+        }
+
+        function init(){
+            posY = 0;
+            rotation = 0;
+            stateCode = 0;
+            Currentblock = Math.floor(Math.random()*7);
+        }
+
+        function printBlock(){
+            posIndex= 4 * Currentblock + rotation;
+            for(i=0;i<4;i++){
+                context.beginPath();
+                context.fillRect(h*(posX+x[posIndex][i]),h*(posY+y[posIndex][i]),h,h);
+                context.closePath();
+            }
+        }
+
+        function moveBlock(){
+            var timecount = requestAnimationFrame(moveBlock);
+            context.clearRect(0,0,300,600);
+            printScreen();
+            posIndex = 4 * Currentblock + rotation;
+
+            if(stateCode===2){  // up (rotation)
+                rotation++;
+                rotation = rotation%4;
+                stateCode = 0;
+            }
+            else if(stateCode===1){ // left
+                let left = true;
+                mostBlock();
+                let tt = posX + most_left;
+                if(tt===0){ left = false; }
+                for(i=0;i<Leftblock[posIndex].length;i++){
+                    let left_x = posX + x[posIndex][Leftblock[posIndex][i]];
+                    let left_y = posY + y[posIndex][Leftblock[posIndex][i]];
+                    left_x++;
+                    if(screen[left_y*10+left_x]===1){ left = false;}
+                }
+                if(left===true){ posX--; }
+                stateCode=0;
+            }
+            else if(stateCode===3){ // right
+                let right = true;
+                mostBlock();
+                let tt = posX + most_right;
+                if(tt===9){ right = false; }
+                for(i=0;i<Rightblock[posIndex].length;i++){
+                    let right_x = posX + x[posIndex][Rightblock[posIndex][i]];
+                    let right_y = posY + y[posIndex][Rightblock[posIndex][i]];
+                    right_x++;
+                    if(screen[right_y*10+right_x]===1){ right = false;}
+                }
+                if(right===true){ posX++; }
+                stateCode=0;
+            }
+            else if(stateCode===4){ // down
+                let down = true;
+                mostBlock();
+                let tt = posY + most_down;
+                if(tt===19){ down = false; }
+                for(i=0;i<Downblock[posIndex].length;i++){
+                    let down_x = posX + x[posIndex][Downblock[posIndex][i]];
+                    let down_y = posY + y[posIndex][Downblock[posIndex][i]];
+                    down_y++;
+                    if(screen[down_y*10+down_x]===1){
+                        down = false;
+                    }
+                }
+                if(down===true){ posY++; }
+                else{ fixBlock(); }
+                stateCode=0;
+            }
+
+            printBlock();
+            deleteLine();
+
+            if(timecount%35===0){
+                let down = true;
+                mostBlock();
+                let tt = posY + most_down;
+                if(tt===19){ down = false; }
+                for(i=0;i<Downblock[posIndex].length;i++){
+                    let down_x = posX + x[posIndex][Downblock[posIndex][i]];
+                    let down_y = posY + y[posIndex][Downblock[posIndex][i]];
+                    down_y++;
+                    if(screen[down_y*10+down_x]===1){
+                        down = false;
+                    }
+                }
+                if(down===true){ posY++; }
+                else{ fixBlock(); }
+                if(testEnd()===true){
+                cancelAnimationFrame(timecount);
+                setTimeout(function(){ alert("Game Over!\n"); },100);
+                }
+            }
+        }
+
+        function fixBlock(){
+            for(i=0;i<4;i++){
+                let t = 10*(posY+y[posIndex][i]) + posX+x[posIndex][i];
+                screen[t] = 1;
+            }
+            posY = 0;
+            init();
+        }
+
+        function mostBlock(){
+            if(stateCode===1){
+                most_left = x[posIndex][0];
+                for(i=1;i<4;i++){
+                    if(most_left>x[posIndex][i]){ most_left = x[posIndex][i]; }
+                }
+            }
+            else if(stateCode===3){
+                most_right = x[posIndex][0];
+                for(i=1;i<4;i++){
+                    if(most_right<x[posIndex][i]){ most_right = x[posIndex][i]; }
+                }
+            }
+            else if(stateCode===4){
+                most_down = y[posIndex][0];
+                for(i=1;i<4;i++){
+                    if(most_down<y[posIndex][i]){ most_down = y[posIndex][i]; }
+                }
+            }
+            else if(stateCode===0){
+                most_down = y[posIndex][0];
+                for(i=1;i<4;i++){
+                    if(most_down<y[posIndex][i]){ most_down = y[posIndex][i]; }
+                }
+            }
+        }
+
+        function deleteLine(){
+            let q;
+            for(j=19;j>0;j--){
+                let p = 0;
+                while(p<10){
+                    let k = 10*j +p;
+                    q = 0;
+                    if(screen[k]===0){ break; }
+                    q = 1;  // 한 줄이 모두 꽉 찼으면 q는 1 아니면 0
+                    p++;
+                }
+                if(q===1){
+                    for(i=j;i>0;i--){
+                        for(let l=0;l<10;l++){
+                            let k = 10*i +l;
+                            screen[k] = screen[k-10];
+                        }
+                    }
+                    j += 1;
+                }
+            }        
+        }
+
+        
+        function printScreen(){
+            for(j=0;j<20;j++){
+                for(i=0;i<10;i++){
+                    let t = 10*j + i;
+                    if(screen[t]===1){
+                        context.beginPath();
+                        context.fillRect(h*i,h*j,h,h);
+                        context.closePath();
+                    }
+                }
+            }
+        }
+        
+        function testEnd(){
+            for(i=0;i<10;i++){
+                if(screen[i]===1){ return true; }
+            }
+            return false;
+        }
+
+        for(i=0;i<200;i++){ screen[i] = 0; }
+        posX = 4;
+        init();
+        moveBlock();
+    </script>
+</html>

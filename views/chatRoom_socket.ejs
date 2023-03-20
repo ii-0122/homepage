@@ -1,0 +1,119 @@
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <meta charset="UTF-8">
+        <title>chat</title>
+    </head>
+    <body>
+        <br>
+        <div class="div_chat" id="chat" name="chat"></div>
+        <form id="chat_form" style="text-align:center;">
+            <textarea id="chat_txt" name="chat_txt" value ="" style="font-size:18px; width:30%; height:60px;" maxlength="150"></textarea>
+            <br>
+            <button type="submit" id="btn_submit" name="btn_submit" class="btn_style">전송</button>
+        </form>
+    </body>
+</html>
+<script>
+    var myName = prompt("채팅방에서 사용할 닉네임을 입력하세요.","default");
+    var msgBox_div = document.getElementById("chat");
+    //$('#chat').scrollTop($('#chat').height());
+    
+    $(function(){ 
+        var socket = io('/chatRoom');
+
+        var code = makeRandcode();
+        socket.emit('login',{
+            userCode: code,
+            userName: myName
+        });
+
+        socket.on('login',function(data){
+            $("#chat").append("<div style='text-align:center;'><strong>" + data + "</strong> 님이 입장하셨습니다</div>");
+        });
+
+        socket.on('s2c disconnect',function(data){
+            $("#chat").append("<div style='text-align:center;'><strong>" + data + "</strong> 님이 퇴장하셨습니다</div>");
+        });
+
+        socket.on('s2c chat',function(data){
+            let instant_txt = data.msg;
+            instant_txt = instant_txt.replace(/\n/gi,'<br>');
+            let time = timeNow();
+            var screen_msg = "<span style='font-size:17px; font-weight:600;'>[ " + data.from.userName + " ] </span><span style='font-size:11px;'>" + time +"</span><br>" + instant_txt;
+            $("#chat").append("<div class='mbox'>"+ screen_msg + "</div>");
+            $("#chat").append("<div><br><br><br></div>");
+            $('#chat').scrollTop($('#chat').height());
+        });
+
+        $("form").submit(function(e){
+            e.preventDefault();
+            var $msg_txt = $("#chat_txt");
+            
+            if($msg_txt.val() !== ""){
+                socket.emit("chat", { msg: $msg_txt.val() });
+                $msg_txt.val("");
+            }
+        });
+    })
+
+    function makeRandcode(){
+        var user_code ="";
+        var alph = "abcdefghijklmnopqrstuvwxyz";
+        for(var i = 0; i < 8; i++){
+            user_code += alph.charAt(Math.floor(Math.random() * alph.length));
+        }
+        return user_code;
+    }
+
+    function timeNow(){
+        let today = new Date();
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+        
+        let now = hours + " : " + minutes;
+        return now;
+    }
+</script>
+<style>
+    .divstyle{
+        text-align: center;
+    }
+
+    .div_chat{
+        margin: auto;
+        padding: auto;
+        text-align: left;
+        width: 30%;
+        height: 80%;
+        overflow: auto;
+        background-color: rgb(231, 231, 231);
+        border: 3px;
+        border-color:black;
+    }
+
+    .mbox{
+        padding: 2px;
+        width:95%;
+        height:auto;
+        float:left;
+        text-align:left;
+        background-color: rgb(255, 243, 228);
+        font-size:15px;
+        font-weight: 400;
+        border:solid 1px;
+        border-color:black;
+        box-shadow: 0px 0px 5px 0px #443129;
+    }
+
+    .btn_style{
+        width: 30%;
+        height: 35px;
+        background-color:rgb(255, 242, 218);
+        border-color: rgb(0, 0, 0);
+    }
+    .btn_style:hover{
+        background-color: rgb(255, 237, 204);
+    }
+</style>
