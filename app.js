@@ -239,6 +239,8 @@ app.get('/rank', function(req,res){
     var score_all = [];
 
     for(var i=0;i<5;i++){
+      console.log(name_all);
+      console.log(result[0][1].name_numberpuzzle);
       name_all.push(result[0][i].name_numberpuzzle);
       score_all.push(result[0][i].score_numberpuzzle);
     }
