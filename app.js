@@ -238,19 +238,21 @@ app.get('/rank', function(req,res){
     var name_all = [];
     var score_all = [];
 
-    for(var i=0;i<5;i++){
-      name_all.push(result[0][i].name_numberpuzzle);
-      score_all.push(result[0][i].score_numberpuzzle);
-    }
-    for(var i=0;i<5;i++){
-      console.log(result[1][i]);
-      name_all.push(result[1][i].name_snakegame);
-      score_all.push(result[1][i].score_snakegame);
-    }
-    for(var i=0;i<5;i++){
-      console.log(result[2][i]);
-      name_all.push(result[2][i].name_tetris);
-      score_all.push(result[2][i].score_tetris);
+    {
+      for(var i=0;i<5;i++){
+        name_all.push(result[0][i].name_numberpuzzle);
+        score_all.push(result[0][i].score_numberpuzzle);
+      }
+      for(var i=0;i<5;i++){
+        //console.log(result[1][i]);
+        name_all.push(result[1][i].name_snakegame);
+        score_all.push(result[1][i].score_snakegame);
+      }
+      for(var i=0;i<5;i++){
+        //console.log(result[2][i]);
+        name_all.push(result[2][i].name_tetris);
+        score_all.push(result[2][i].score_tetris);
+      }
     }
     console.log(name_all,score_all);
     res.render('rank.ejs', { name:name_all, score:score_all } );
