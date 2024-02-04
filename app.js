@@ -1,4 +1,4 @@
-var mysql = require("mysql");
+var maria = require("/.maria");
 var express = require("express");
 const { get } = require("express/lib/response");
 var ejs = require("ejs");
@@ -11,14 +11,16 @@ var nsp_Tetris = io.of('/Tetris');
 const PORT = 8080;  // spring과 중복되는 경우 변경 필요
 var sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
 var screen = "";
-var connection = mysql.createConnection({
-  host: 'mariadb-01', // '127.0.0.1' localhost
-  port: '3306', // 3306
-  user: 'admin_01',  // testnew
-  password: 'ad*6216',  // pass12345
-  database: 'testdb', // testdb
-  multipleStatements: true
-});
+
+maria.connect();
+// var connection = maria.createConnection({   // 배포에 mariadb 사용
+//   host: 'mariadb-01', // '127.0.0.1' localhost
+//   port: '3306', // 3306
+//   user: 'admin_01',  // testnew
+//   password: 'ad*6216',  // pass12345
+//   database: 'testdb', // testdb
+//   multipleStatements: true
+// });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -117,7 +119,7 @@ app.get('/saveData_NumberPuzzle',function(req,res){
   res.end();
 });
 
-app.get('/',function(req,res){
+app.get('/',function(req,res){    // main page
   var main = fs.readFileSync('./views/main.ejs','utf8');
 
   screen = ejs.render(sideBar_left) + ejs.render(main);
@@ -133,6 +135,7 @@ app.get('/NumberPuzzle',function(req,res){
   res.write(screen,'utf8');
   res.end();
 });
+
 app.get('/SnakeGame',function(req,res){
   var sg = fs.readFileSync('./games/SnakeGame/SnakeGame.ejs','utf8');
   
