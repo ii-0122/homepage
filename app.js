@@ -12,7 +12,7 @@ const PORT = 8080;  // spring과 중복되는 경우 변경 필요
 var sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
 var screen = "";
 var connection = mysql.createConnection({
-  host:'127.0.0.1', // '127.0.0.1' localhost
+  host: 'svc.sel5.cloudtype.app', // '127.0.0.1' localhost
   port: '32540', // 3306
   user: 'admin_01',  // testnew
   password: 'ad*6216',  // pass12345
