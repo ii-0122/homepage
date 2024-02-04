@@ -1,4 +1,4 @@
-var maria = require("/.maria");
+var maria = require("./maria");
 var express = require("express");
 const { get } = require("express/lib/response");
 var ejs = require("ejs");
