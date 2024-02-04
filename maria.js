@@ -9,4 +9,4 @@ var connection = maria.createConnection({   // 배포에 mariadb 사용
     multipleStatements: true
   });
 
-  module.exports = conn;
+  module.exports = connection;
