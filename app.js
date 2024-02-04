@@ -1,4 +1,4 @@
-var maria = require("./maria");
+var connection = require("./maria");
 var express = require("express");
 const { get } = require("express/lib/response");
 var ejs = require("ejs");
@@ -12,7 +12,7 @@ const PORT = 8080;  // spring과 중복되는 경우 변경 필요
 var sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
 var screen = "";
 
-maria.connect();
+connection.connect(); //
 // var connection = maria.createConnection({   // 배포에 mariadb 사용
 //   host: 'mariadb-01', // '127.0.0.1' localhost
 //   port: '3306', // 3306
