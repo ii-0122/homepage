@@ -263,6 +263,7 @@ app.get('/rank', function(req,res){
   });
 });
 
+// here ↓
 app.get('/chatRoom_db',function(req,res){
   var db_chat = fs.readFileSync('./views/chatRoom_db.ejs','utf8');
 

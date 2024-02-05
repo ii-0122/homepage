@@ -16,19 +16,40 @@
     </body>
 </html>
 <script>
-    var myName = prompt("채팅방에서 사용할 닉네임을 입력하세요.","default");
+    var myName = prompt("채팅방에서 사용할 닉네임을 입력하세요.","default_user");
     var msgBox_div = document.getElementById("chat");
     //$('#chat').scrollTop($('#chat').height());
+
+    function makeRandcode(){
+        var user_code ="";
+        var alph = "abcdefghijklmnopqrstuvwxyz";
+        for(var i = 0; i < 8; i++){
+            user_code += alph.charAt(Math.floor(Math.random() * alph.length));
+        }
+        return user_code;
+    }
+
+    function timeNow(){
+        let today = new Date();
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+        
+        let now = hours + " : " + minutes;
+        return now;
+    }
+    
     
     $(function(){ 
+        console.log('페이지가 정상적으로 열렸나?');
         var socket = io('/chatRoom');
 
         var code = makeRandcode();
+        console.log(code);
         socket.emit('login',{
             userCode: code,
             userName: myName
         });
-
+        console.log('로그인 전');
         socket.on('login',function(data){
             $("#chat").append("<div style='text-align:center;'><strong>" + data + "</strong> 님이 입장하셨습니다</div>");
         });
@@ -58,23 +79,6 @@
         });
     })
 
-    function makeRandcode(){
-        var user_code ="";
-        var alph = "abcdefghijklmnopqrstuvwxyz";
-        for(var i = 0; i < 8; i++){
-            user_code += alph.charAt(Math.floor(Math.random() * alph.length));
-        }
-        return user_code;
-    }
-
-    function timeNow(){
-        let today = new Date();
-        let hours = today.getHours();
-        let minutes = today.getMinutes();
-        
-        let now = hours + " : " + minutes;
-        return now;
-    }
 </script>
 <style>
     .divstyle{
