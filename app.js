@@ -1,16 +1,16 @@
 const conn = require("./maria.js");
-var express = require("express");
+const express = require("express");
 const { get } = require("express/lib/response");
-var ejs = require("ejs");
+const ejs = require("ejs");
 var fs = require("fs");
-var app = express();
-var server = require("http").createServer(app);
-var io = require("socket.io")(server);
-var nsp_chatRoom = io.of('/chatRoom');
-var nsp_Tetris = io.of('/Tetris');
-const PORT = 8080;  // spring과 중복되는 경우 변경 필요
-var sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
-var screen = "";
+const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
+const nsp_chatRoom = io.of('/chatRoom');
+const nsp_Tetris = io.of('/Tetris');
+const PORT = 8080;  // 중복되는 경우 변경 필요
+let sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
+let screen = "";
 
 conn.connect();
 
@@ -219,73 +219,61 @@ app.get('/MineSearch',function(req,res){
   }
 });
 
-app.get('/rank', function(req, res) {
-  // way 1
+app.get('/rank', (req, res) => {
+  let name_all = [];
+  let score_all = [];
+  // way 1 - multi query
   // let sql1 ="SELECT * FROM numberpuzzle ORDER BY score_numberpuzzle ASC LIMIT 5; ";
   // let sql2 = "SELECT * FROM snakegame ORDER BY score_snakegame DESC LIMIT 5; ";
   // let sql3 = "SELECT * FROM tetris ORDER BY score_tetris DESC LIMIT 5;";
   // const multiple_sql = sql1 + sql2 + sql3;
 
-  // conn.query(multiple_sql, function (err, result) {
+  // conn.query(multiple_sql, (err, result) => {
   //   if (err){ console.log(err); }
-  //   console.log(result);
-  //   let name_all = [];
-  //   let score_all = [];
 
-  //   {
-  //     for(var i=0; i<5; i++){
-  //       name_all.push(result[0][i].name_numberpuzzle);
-  //       score_all.push(result[0][i].score_numberpuzzle);
-  //     }
-  //     for(var i=0; i<5; i++){
-  //       //console.log(result[1][i]);
-  //       name_all.push(result[1][i].name_snakegame);
-  //       score_all.push(result[1][i].score_snakegame);
-  //     }
-  //     for(var i=0; i<5; i++){
-  //       //console.log(result[2][i]);
-  //       name_all.push(result[2][i].name_tetris);
-  //       score_all.push(result[2][i].score_tetris);
-  //     }
+  //   for(let i=0; i<5; i++){
+  //     name_all.push(result[0][i].name_numberpuzzle);
+  //     score_all.push(result[0][i].score_numberpuzzle);
   //   }
+  //   for(let i=0; i<5; i++){
+  //     name_all.push(result[1][i].name_snakegame);
+  //     score_all.push(result[1][i].score_snakegame);
+  //   }
+  //   for(let i=0; i<5; i++){
+  //     name_all.push(result[2][i].name_tetris);
+  //     score_all.push(result[2][i].score_tetris);
+  //   }
+  // });
 
-    // way 2
-    let sql = `SELECT n.name_numberpuzzle AS temp_name, n.score_numberpuzzle AS temp_score FROM (
-        SELECT * FROM numberpuzzle AS n ORDER BY n.score_numberpuzzle ASC LIMIT 5
-      ) AS n
-      UNION ALL
-      SELECT s.name_snakegame AS temp_name, s.score_snakegame AS temp_score FROM (
-        SELECT * FROM snakegame AS s ORDER BY s.score_snakegame DESC LIMIT 5
-      ) AS s
-      UNION ALL
-      SELECT t.name_tetris AS temp_name, t.score_tetris AS temp_score FROM (
-        SELECT * FROM tetris AS t ORDER BY t.score_tetris DESC LIMIT 5
-      ) AS t`;
+  // way 2 - single query
+  let sql = `SELECT n.name_numberpuzzle AS temp_name, n.score_numberpuzzle AS temp_score FROM (
+      SELECT * FROM numberpuzzle AS n ORDER BY n.score_numberpuzzle ASC LIMIT 5
+    ) AS n
+    UNION ALL
+    SELECT s.name_snakegame AS temp_name, s.score_snakegame AS temp_score FROM (
+      SELECT * FROM snakegame AS s ORDER BY s.score_snakegame DESC LIMIT 5
+    ) AS s
+    UNION ALL
+    SELECT t.name_tetris AS temp_name, t.score_tetris AS temp_score FROM (
+    SELECT * FROM tetris AS t ORDER BY t.score_tetris DESC LIMIT 5
+    ) AS t`;
     
-    conn.query(sql, function (err, result) {
-    if (err){ console.log(err); }
-    console.log(result);
-    let name_all = [];
-    let score_all = [];
-
-    {
-      for(var i=0; i < 15; i++){
-        name_all.push(result[i].temp_name);
-        score_all.push(result[i].temp_score);
-      }
+  conn.query(sql, (err, result) => {
+    if (err){
+      res.status(400).send(err);
     }
-    
-    console.log(name_all,score_all);
-    res.render('rank.ejs', { name : name_all, score : score_all } );
-    //res.writeHead(200);
-    //{ 'Content-Type': 'application/json' }
-    //res.write(JSON.stringify(html));
-    res.end();
+
+    for(let i = 0; i < 15; i++){
+      name_all.push(result[i].temp_name);
+      score_all.push(result[i].temp_score);
+    }
   });
+  // console.log(name_all,score_all);
+  res.status(200).render('rank.ejs', { name : name_all, score : score_all } );
+  // res.status(200).end();
 });
 
-// here ↓
-app.get('/chatRoom_db',function(req,res){
+app.get('/chatRoom_db', (req,res) => {
   var db_chat = fs.readFileSync('./views/chatRoom_db.ejs','utf8');
 
     screen = ejs.render(sideBar_left) + ejs.render(db_chat);
@@ -293,29 +281,29 @@ app.get('/chatRoom_db',function(req,res){
     res.write(screen,'utf8');
     res.end();
 });
+
 app.post('/chat_save', (req,res) => {
-  //console.log(req.headers);
-  var user = req.body.chat_name;
-  var user_txt = req.body.chat_txt;
+  let user = req.body.chat_name;
+  let user_txt = req.body.chat_txt;
   console.log(user,user_txt);
 
-  var sql = "INSERT INTO chat (user_name,inner_text) values ('"+ user + "','" + user_txt +"')";
-  //console.log(sql);
+  let sql = "INSERT INTO chat (user_name,inner_text) values ('"+ user + "','" + user_txt +"')";
   conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
   });
   res.end();
 });
-app.post('/conn_chat', (req,res)=>{
-  //console.log(req.body.test_txt);
-  var sql = "SELECT user_name,inner_text FROM chat ORDER BY index_chat ASC";
+
+app.post('/conn_chat', (req, res) => {
+  let sql = "SELECT user_name,inner_text FROM chat ORDER BY index_chat ASC";
   conn.query(sql, function(err,result){
     if (err){ console.log(err); }
     res.send(result);
   });
 });
 
-app.get('/chatRoom', function(req,res){
+// ***** 에러 수정 필요 *****
+app.get('/chatRoom', (req, res) => {
   var socket_chat = fs.readFileSync('./views/chatRoom_socket.ejs','utf8');
 
   screen = ejs.render(sideBar_left) + ejs.render(socket_chat);
@@ -323,5 +311,5 @@ app.get('/chatRoom', function(req,res){
   res.write(screen,'utf8');
   res.end();
 });
-//app.listen(PORT);
-server.listen(PORT);
+
+app.listen(PORT);
