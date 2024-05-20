@@ -1,6 +1,6 @@
 const maria = require('mysql');
 
-var connection = maria.createConnection({   // 배포에 mariadb 사용
+var conn = maria.createConnection({   // 배포에 mariadb 사용
     host: 'mariadb-01', // '127.0.0.1' localhost
     port: '3306', // 3306
     user: 'admin_01',  // testnew
@@ -9,4 +9,4 @@ var connection = maria.createConnection({   // 배포에 mariadb 사용
     multipleStatements: true
   });
 
-  module.exports = connection;
+  module.exports = conn;

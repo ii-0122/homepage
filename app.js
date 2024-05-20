@@ -1,4 +1,4 @@
-var connection = require("./maria");
+const conn = require("./maria.js");
 var express = require("express");
 const { get } = require("express/lib/response");
 var ejs = require("ejs");
@@ -12,15 +12,7 @@ const PORT = 8080;  // spring과 중복되는 경우 변경 필요
 var sideBar_left = fs.readFileSync('./views/sideBar.ejs','utf8');
 var screen = "";
 
-connection.connect(); //
-// var connection = maria.createConnection({   // 배포에 mariadb 사용
-//   host: 'mariadb-01', // '127.0.0.1' localhost
-//   port: '3306', // 3306
-//   user: 'admin_01',  // testnew
-//   password: 'ad*6216',  // pass12345
-//   database: 'testdb', // testdb
-//   multipleStatements: true
-// });
+conn.connect();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -79,12 +71,12 @@ app.get('/saveData_Tetris',function(req,res){
   var score = req.query.score;
   console.log(name,score);
 
-  //connection.connect();
+  //conn.connect();
   var sql = "INSERT INTO tetris (name_tetris,score_tetris) values ('"+ name + "'," + score +")";
-  connection.query(sql, function (err, result) {
+  conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
   });
-  //connection.end();
+  //conn.end();
   res.redirect('/');
   res.end();
 });
@@ -94,12 +86,11 @@ app.get('/saveData_SnakeGame',function(req,res){
   var score = req.query.score;
   console.log(name,score);
 
-  //connection.connect();
   var sql = "INSERT INTO snakegame (name_snakegame,score_snakegame) values ('"+ name + "'," + score +")";
-  connection.query(sql, function (err, result) {
+  conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
   });
-  //connection.end();
+  //conn.end();
   res.redirect('/');
   res.end();
 });
@@ -109,12 +100,11 @@ app.get('/saveData_NumberPuzzle',function(req,res){
   var score = req.query.score;
   console.log(name,score);
 
-  //connection.connect();
   var sql = "INSERT INTO numberpuzzle (name_numberpuzzle,score_numberpuzzle) values ('"+ name + "'," + score +")";
-  connection.query(sql, function (err, result) {
+  conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
   });
-  //connection.end();
+  //conn.end();
   res.redirect('/');
   res.end();
 });
@@ -229,33 +219,64 @@ app.get('/MineSearch',function(req,res){
   }
 });
 
-app.get('/rank', function(req,res){
-  //connection.connect();
-  var sql ="SELECT * FROM numberpuzzle ORDER BY score_numberpuzzle ASC LIMIT 5; SELECT * FROM snakegame ORDER BY score_snakegame DESC LIMIT 5; SELECT * FROM tetris ORDER BY score_tetris DESC LIMIT 5; ";
-  connection.query(sql, function (err, result) {
+app.get('/rank', function(req, res) {
+  // way 1
+  // let sql1 ="SELECT * FROM numberpuzzle ORDER BY score_numberpuzzle ASC LIMIT 5; ";
+  // let sql2 = "SELECT * FROM snakegame ORDER BY score_snakegame DESC LIMIT 5; ";
+  // let sql3 = "SELECT * FROM tetris ORDER BY score_tetris DESC LIMIT 5;";
+  // const multiple_sql = sql1 + sql2 + sql3;
+
+  // conn.query(multiple_sql, function (err, result) {
+  //   if (err){ console.log(err); }
+  //   console.log(result);
+  //   let name_all = [];
+  //   let score_all = [];
+
+  //   {
+  //     for(var i=0; i<5; i++){
+  //       name_all.push(result[0][i].name_numberpuzzle);
+  //       score_all.push(result[0][i].score_numberpuzzle);
+  //     }
+  //     for(var i=0; i<5; i++){
+  //       //console.log(result[1][i]);
+  //       name_all.push(result[1][i].name_snakegame);
+  //       score_all.push(result[1][i].score_snakegame);
+  //     }
+  //     for(var i=0; i<5; i++){
+  //       //console.log(result[2][i]);
+  //       name_all.push(result[2][i].name_tetris);
+  //       score_all.push(result[2][i].score_tetris);
+  //     }
+  //   }
+
+    // way 2
+    let sql = `SELECT n.name_numberpuzzle AS temp_name, n.score_numberpuzzle AS temp_score FROM (
+        SELECT * FROM numberpuzzle AS n ORDER BY n.score_numberpuzzle ASC LIMIT 5
+      ) AS n
+      UNION ALL
+      SELECT s.name_snakegame AS temp_name, s.score_snakegame AS temp_score FROM (
+        SELECT * FROM snakegame AS s ORDER BY s.score_snakegame DESC LIMIT 5
+      ) AS s
+      UNION ALL
+      SELECT t.name_tetris AS temp_name, t.score_tetris AS temp_score FROM (
+        SELECT * FROM tetris AS t ORDER BY t.score_tetris DESC LIMIT 5
+      ) AS t`;
+    
+    conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
-    //console.log(result[0][1].name_numberpuzzle);
-    var name_all = [];
-    var score_all = [];
+    console.log(result);
+    let name_all = [];
+    let score_all = [];
 
     {
-      for(var i=0;i<5;i++){
-        name_all.push(result[0][i].name_numberpuzzle);
-        score_all.push(result[0][i].score_numberpuzzle);
-      }
-      for(var i=0;i<5;i++){
-        //console.log(result[1][i]);
-        name_all.push(result[1][i].name_snakegame);
-        score_all.push(result[1][i].score_snakegame);
-      }
-      for(var i=0;i<5;i++){
-        //console.log(result[2][i]);
-        name_all.push(result[2][i].name_tetris);
-        score_all.push(result[2][i].score_tetris);
+      for(var i=0; i < 15; i++){
+        name_all.push(result[i].temp_name);
+        score_all.push(result[i].temp_score);
       }
     }
+    
     console.log(name_all,score_all);
-    res.render('rank.ejs', { name:name_all, score:score_all } );
+    res.render('rank.ejs', { name : name_all, score : score_all } );
     //res.writeHead(200);
     //{ 'Content-Type': 'application/json' }
     //res.write(JSON.stringify(html));
@@ -280,7 +301,7 @@ app.post('/chat_save', (req,res) => {
 
   var sql = "INSERT INTO chat (user_name,inner_text) values ('"+ user + "','" + user_txt +"')";
   //console.log(sql);
-  connection.query(sql, function (err, result) {
+  conn.query(sql, function (err, result) {
     if (err){ console.log(err); }
   });
   res.end();
@@ -288,7 +309,7 @@ app.post('/chat_save', (req,res) => {
 app.post('/conn_chat', (req,res)=>{
   //console.log(req.body.test_txt);
   var sql = "SELECT user_name,inner_text FROM chat ORDER BY index_chat ASC";
-  connection.query(sql, function(err,result){
+  conn.query(sql, function(err,result){
     if (err){ console.log(err); }
     res.send(result);
   });
