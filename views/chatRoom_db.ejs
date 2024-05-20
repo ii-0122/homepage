@@ -8,7 +8,7 @@
     <body>
         <br>
         <div class="div_chat" id="chat" name="chat"></div>
-        <form id="chat_form" method="POST" action="/chat_save" style="text-align:center;">
+        <form id="chat_form" method="POST" style="text-align:center;">
             <input hidden="hidden" id="name_hidden" name="chat_name" value="name_default"/>
             <textarea name="chat_txt" style="font-size:18px; width:30%; height:60px;" maxlength="150"></textarea>
             <br>
@@ -25,14 +25,14 @@
 
     setInterval(function(){
         fetch("/conn_chat",{
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            test_txt: "fetch success.."
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                test_txt: "fetch success.."
+            })
         })
-        })
-        .then((res)=>res.json())
-        .then((res)=>{
+        .then((res) => res.json())
+        .then((res) => {
             msgBox_div.innerHTML ="";
             res.forEach(element => {
                 let time = timeNow();
@@ -46,7 +46,7 @@
             });
         })
         $('#chat').scrollTop($('#chat').height());
-        }, 1000);
+    }, 1000);
 
     btn1.onclick = function(e){
         var formData = $("#chat_form").serialize();
