@@ -270,7 +270,7 @@ app.get('/rank', (req, res) => {
   });
   // console.log(name_all,score_all);
   res.status(200).render('rank.ejs', { name : name_all, score : score_all } );
-  // res.status(200).end();
+  res.status(200).end();
 });
 
 app.get('/chatRoom_db', (req,res) => {
