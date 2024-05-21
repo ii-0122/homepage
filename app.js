@@ -243,6 +243,8 @@ app.get('/rank', (req, res) => {
   //     name_all.push(result[2][i].name_tetris);
   //     score_all.push(result[2][i].score_tetris);
   //   }
+  //   res.status(200).render('rank.ejs', { name : name_all, score : score_all } );
+  //   res.status(200).end();
   // });
 
   // way 2 - single query
@@ -267,10 +269,9 @@ app.get('/rank', (req, res) => {
       name_all.push(result[i].temp_name);
       score_all.push(result[i].temp_score);
     }
+    res.status(200).render('rank.ejs', { name : name_all, score : score_all } );
+    // res.status(200).end();
   });
-  // console.log(name_all,score_all);
-  res.status(200).render('rank.ejs', { name : name_all, score : score_all } );
-  res.status(200).end();
 });
 
 app.get('/chatRoom_db', (req,res) => {
