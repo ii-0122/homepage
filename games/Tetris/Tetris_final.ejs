@@ -14,7 +14,7 @@
             <canvas class="floor" id="floor1" name="floor1" width=300 height=40></canvas>
             <br>
             <button class ="btn-block" id="btn_back" onclick="location.href='/'"><span style="font-size:130%;">Go</span><span style="font-size:120%; font-weight:700;">메인으로</span></button>
-            <button class ="btn-block" id="btn_dualPlay"><span style="font-size:130%;">Go</span><span style="font-size:120%; font-weight:700;">2인 플레이</span></button>
+            <button class ="btn-block" id="btn_dualPlay"><span style="font-size:130%;">Go</span><span style="font-size:120%; font-weight:700;">2인 플레이(DEMO)</span></button>
         </div>
         <div class ="divStyle" style="width:25%; float:left" id="tetris2" name="tetris2" style="width:49%; float:left;">
 
@@ -104,7 +104,7 @@
                     ];
         var screen = new Array(200);
         var screen2 = new Array(200);
-        for(var i=0;i<200;i++){ screen[i] = 0; }
+        for(var i=0; i < 200; i++){ screen[i] = 0; }
         var stateCode;
         var posX, posY;
         var Leftval, Rightval;
@@ -125,72 +125,72 @@
             //if(){ stateCode = 5; } // space
         }
 
-        $(function(){   //
-            var socket = io('/Tetris');
+        // $(function(){
+        //     var socket = io('/Tetris');
 
-            var code = makeRandcode();
-            socket.emit('login',{
-                userCode: code
-            });
+        //     var code = makeRandcode();
+        //     socket.emit('login',{
+        //         userCode: code
+        //     });
 
-            // 다른 유저가 듀얼 플레이어로 로그인 한 경우
-            socket.on('dual_player_login',function(){
-                dualPlay = true;
-                dual_play_screen();
-            });
+        //     // 다른 유저가 듀얼 플레이어로 로그인 한 경우
+        //     socket.on('dual_player_login',function(){
+        //         dualPlay = true;
+        //         dual_play_screen();
+        //     });
 
-            // 다른 유저가 듀얼 플레이에서 disconnected 된 경우
-            socket.on('s2c disconnect',function(){
-                console.log("out");
-                $("#tetris2").empty();
-                $("#tetris1").css('width',"55%");
-                $("#btn_back").css('width',"13%");
-                $("#btn_dualPlay").css('width',"13%");
-                dualPlay = false;
-            });
+        //     // 다른 유저가 듀얼 플레이에서 disconnected 된 경우
+        //     socket.on('s2c disconnect',function(){
+        //         console.log("out");
+        //         $("#tetris2").empty();
+        //         $("#tetris1").css('width',"55%");
+        //         $("#btn_back").css('width',"13%");
+        //         $("#btn_dualPlay").css('width',"13%");
+        //         dualPlay = false;
+        //     });
 
-            // 다른 플레이어의 data 수신
-            socket.on('dual_player_data',function(data){
-                //console.log(data);
-                screen2 = data.other_user_screen;
-                block2_x = data.other_user_block_x;
-                block2_y = data.other_user_block_y;
-                printBlock_others();
-                printScreen_others();
-            });
+        //     // 다른 플레이어의 data 수신
+        //     socket.on('dual_player_data',function(data){
+        //         //console.log(data);
+        //         screen2 = data.other_user_screen;
+        //         block2_x = data.other_user_block_x;
+        //         block2_y = data.other_user_block_y;
+        //         printBlock_others();
+        //         printScreen_others();
+        //     });
 
-            $("#btn_dualPlay").click(function(){
-                dual_play_screen();
-                dualPlay = true;
-                socket.emit('dual_player_login',{});  
-            });
+        //     $("#btn_dualPlay").click(function(){
+        //         dual_play_screen();
+        //         dualPlay = true;
+        //         socket.emit('dual_player_login',{});  
+        //     });
 
-            setInterval(function(){
-            //console.log("..");
-            if(dualPlay===true){
-                socket.emit('dual_player_data',{
-                    screen: screen,
-                    block_x: conn_block_x,
-                    block_y: conn_block_y
-                });
-            }
-            },500);
+        //     setInterval(function(){
+        //     //console.log("..");
+        //     if(dualPlay===true){
+        //         socket.emit('dual_player_data',{
+        //             screen: screen,
+        //             block_x: conn_block_x,
+        //             block_y: conn_block_y
+        //         });
+        //     }
+        //     },500);
 
-            for(i=0;i<200;i++){
-                screen[i] = 0;
-            }
-            init();
-            moveBlock();
-        })
+        //     for(i=0;i<200;i++){
+        //         screen[i] = 0;
+        //     }
+        //     init();
+        //     moveBlock();
+        // })
 
-        function dual_play_screen(){
-            $("#tetris1").css('width',"25%");
-            $("#tetris1").css('float',"left");
-            $("#blank").text(".");
-            $("#btn_back").css('width',"32%");
-            $("#btn_dualPlay").css('width',"32%");
-            $("#tetris2").append("<canvas class='canvasStyle' id='canvas2' width=300px height=600px></canvas><br><canvas style='background-color:rgb(7, 55, 70);' width=300 height=40></canvas>");
-        }
+        // function dual_play_screen(){
+        //     $("#tetris1").css('width',"25%");
+        //     $("#tetris1").css('float',"left");
+        //     $("#blank").text(".");
+        //     $("#btn_back").css('width',"32%");
+        //     $("#btn_dualPlay").css('width',"32%");
+        //     $("#tetris2").append("<canvas class='canvasStyle' id='canvas2' width=300px height=600px></canvas><br><canvas style='background-color:rgb(7, 55, 70);' width=300 height=40></canvas>");
+        // }
 
         function init(){
             posX = 4;
